@@ -1,0 +1,1 @@
+1. Add the combo key as a speech bubble above the skier, not in the corner
