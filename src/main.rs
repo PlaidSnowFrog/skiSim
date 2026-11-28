@@ -8,6 +8,7 @@ pub mod trail;
 pub mod menu;
 pub mod pause;
 pub mod combo;
+pub mod parry;
 
 use bevy::camera::ScalingMode;
 use bevy::prelude::*;
@@ -23,6 +24,7 @@ use trail::TrailPlugin;
 use menu::MenuPlugin;
 use pause::PausePlugin;
 use combo::ComboPlugin;
+use crate::parry::ParryPlugin;
 
 fn main() {
     App::new()
@@ -47,7 +49,8 @@ fn main() {
                       TrailPlugin,
                       MenuPlugin,
                       PausePlugin,
-                      ComboPlugin))
+                      ComboPlugin,
+                      ParryPlugin,))
         .add_systems(Startup, setup_camera)
         .add_systems(Update, scale_ui_to_window)
         .run();

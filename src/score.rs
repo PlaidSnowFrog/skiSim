@@ -20,7 +20,9 @@ pub struct ScorePlugin;
 impl Plugin for ScorePlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<Score>()
+            .init_resource::<LastScoreDrop>()
             .insert_resource(get_high_score())
+            .add_systems(Update, track_score_drop)
             .add_systems(OnEnter(GameState::Playing), spawn_scoreboard)
             .add_systems(Update, (update_high_score, update_scoreboard)
                 .run_if(in_state(GameState::Playing)));
@@ -72,4 +74,30 @@ fn get_high_score() -> HighScore {
         .unwrap_or(0);
 
     return HighScore(value);
+}
+
+// For Parry Mechanic
+#[derive(Resource, Default)]
+pub struct LastScoreDrop {
+    pub time: Option<f32>, // seconds since app start
+    pub amount: u32,       // how many points were lost in the last drop
+    prev: u32,
+}
+
+impl LastScoreDrop {
+    pub fn within(&self, now: f32, secs: f32) -> bool {
+        self.time.is_some_and(|t| now - t <= secs)
+    }
+}
+
+fn track_score_drop(
+    score: Res<Score>,
+    time: Res<Time>,
+    mut drop: ResMut<LastScoreDrop>,
+) {
+    if score.0 < drop.prev {
+        drop.time = Some(time.elapsed_secs());
+        drop.amount = drop.prev - score.0;
+    }
+    drop.prev = score.0;
 }
